@@ -47,4 +47,8 @@ export class DataHandler {
   getMovies(): Movie[] {
     return this.movies;
   }
+
+  deleteMovieById(id: number): void {
+    this.movies = this.movies.filter((movie) => movie.id !== id);
+  }
 }
