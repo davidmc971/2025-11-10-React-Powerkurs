@@ -76,4 +76,18 @@ export class DataHandler {
     //   movie.id === id ? { ...movie, rating } : movie
     // );
   }
+
+  updateMovie(updatedMovie: Movie) {
+    const movie = this.movies.find((m) => m.id === updatedMovie.id);
+    if (movie) {
+      movie.title = updatedMovie.title;
+      movie.description = updatedMovie.description;
+    }
+    this.movies = this.movies.slice();
+    
+    // Alternativ:
+    // this.movies = this.movies.map((movie) =>
+    //   movie.id === updatedMovie.id ? updatedMovie : movie
+    // );
+  }
 }

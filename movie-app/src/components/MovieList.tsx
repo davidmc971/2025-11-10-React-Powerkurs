@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { DataHandler, Movie } from "../DataHandler";
 
 type MovieListProps = {
@@ -36,6 +37,8 @@ function MovieListItem({
   dataHandler,
   updateMovies,
 }: MovieListItemProps) {
+  const [isInEditMode, setIsInEditMode] = useState(false);
+
   const handleDelete = () => {
     dataHandler.deleteMovieById(movie.id);
     updateMovies();
@@ -48,6 +51,20 @@ function MovieListItem({
       dataHandler.rateMovie(movie.id, newRating);
       updateMovies();
     }
+  };
+
+  const toggleEditMode = () => {
+    setIsInEditMode(!isInEditMode);
+  };
+
+  const onEditSubmit = (updatedMovie: Movie) => {
+    dataHandler.updateMovie(updatedMovie);
+    updateMovies();
+    setIsInEditMode(false);
+  };
+
+  if (isInEditMode) {
+    return <MovieItemEdit movie={movie} onSubmit={onEditSubmit} />;
   }
 
   return (
@@ -57,7 +74,38 @@ function MovieListItem({
       </h2>
       <p>{movie.description}</p>
       <button onClick={handleRate}>Rate</button>
+      <button onClick={toggleEditMode}>Edit</button>
       <button onClick={handleDelete}>Delete</button>
+    </li>
+  );
+}
+
+type MovieItemEditProps = {
+  movie: Movie;
+  onSubmit: (updatedMovie: Movie) => void;
+};
+
+function MovieItemEdit({ movie, onSubmit }: MovieItemEditProps) {
+  const [title, setTitle] = useState(movie.title);
+  const [description, setDescription] = useState(movie.description);
+
+  const handleSubmit = () => {
+    onSubmit({ ...movie, title, description });
+  };
+
+  return (
+    <li style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <h2>Edit Movie: {movie.title}</h2>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <button onClick={handleSubmit}>Save</button>
     </li>
   );
 }
