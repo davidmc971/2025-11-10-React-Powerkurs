@@ -5,8 +5,11 @@ export type Movie = {
   rating: number;
 };
 
+type NewMovie = Omit<Movie, "id"> & { id?: number };
+
 export class DataHandler {
   movies: Movie[];
+  nextMovieId: number;
 
   constructor() {
     // Initialize with some dummy data
@@ -42,13 +45,22 @@ export class DataHandler {
         rating: 8.9,
       }
     ];
+    this.nextMovieId = 6;
   }
 
   getMovies(): Movie[] {
     return this.movies;
   }
 
-  deleteMovieById(id: number): void {
+  deleteMovieById(id: number) {
     this.movies = this.movies.filter((movie) => movie.id !== id);
+  }
+
+  addMovie(movie: NewMovie) {
+    if (movie.id === undefined) {
+      movie.id = this.nextMovieId++;
+    }
+    this.movies.push(movie as Movie);
+    this.movies = this.movies.slice();
   }
 }
