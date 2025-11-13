@@ -43,7 +43,7 @@ export class DataHandler {
         title: "Pulp Fiction",
         description: "A cult classic crime film",
         rating: 8.9,
-      }
+      },
     ];
     this.nextMovieId = 6;
   }
@@ -62,5 +62,18 @@ export class DataHandler {
     }
     this.movies.push(movie as Movie);
     this.movies = this.movies.slice();
+  }
+
+  rateMovie(id: number, rating: number) {
+    const movie = this.movies.find((m) => m.id === id);
+    if (movie) {
+      movie.rating = rating;
+    }
+    this.movies = this.movies.slice();
+
+    // Alternativ:
+    // this.movies = this.movies.map((movie) =>
+    //   movie.id === id ? { ...movie, rating } : movie
+    // );
   }
 }

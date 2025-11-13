@@ -41,12 +41,22 @@ function MovieListItem({
     updateMovies();
   };
 
+  const handleRate = () => {
+    const userInput = prompt("Neue Bewertung eingeben (0-10):") ?? "";
+    const newRating = parseFloat(userInput);
+    if (!isNaN(newRating) && newRating >= 0 && newRating <= 10) {
+      dataHandler.rateMovie(movie.id, newRating);
+      updateMovies();
+    }
+  }
+
   return (
     <li>
       <h2>
         {movie.title} ({movie.rating})
       </h2>
       <p>{movie.description}</p>
+      <button onClick={handleRate}>Rate</button>
       <button onClick={handleDelete}>Delete</button>
     </li>
   );
