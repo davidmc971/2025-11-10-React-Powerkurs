@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 import MovieList from "./components/MovieList";
 import { DataHandler } from "./DataHandler";
@@ -23,9 +23,9 @@ function App() {
 
   const [movies, setMovies] = useState(dataHandler.getMovies());
 
-  const updateMovies = () => {
+  const updateMovies = useCallback(() => {
     setMovies(dataHandler.getMovies());
-  };
+  }, [dataHandler]);
 
   const handleAddMovie = () => {
     const newMovie = {
@@ -37,6 +37,37 @@ function App() {
     dataHandler.addMovie(newMovie);
     updateMovies();
   };
+
+  useEffect(() => {
+    fetch("https://api.themoviedb.org/3/discover/movie", {
+      headers: {
+        Authorization: "Bearer " + import.meta.env.VITE_MOVIEDB_API_KEY,
+      },
+    })
+      .then((response) => response.json())
+      .then(
+        (data: {
+          results: {
+            id: number;
+            title: string;
+            overview: string;
+            vote_average: number;
+          }[];
+        }) => {
+          console.log("Fetched movies from external API:", data);
+
+          data.results.forEach((movie) => {
+            dataHandler.addMovie({
+              title: movie.title,
+              description: movie.overview,
+              rating: movie.vote_average,
+              isFavorite: false,
+            });
+          });
+          updateMovies();
+        }
+      );
+  }, [dataHandler, updateMovies]);
 
   return (
     <>

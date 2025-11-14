@@ -70,13 +70,18 @@ export class DataHandler {
 
   deleteMovieById(id: number) {
     this.movies = this.movies.filter((movie) => movie.id !== id);
-    
+
     this.persistMovies();
   }
 
   addMovie(movie: NewMovie) {
     if (movie.id === undefined) {
       movie.id = this.nextMovieId++;
+    } else if (this.movies.some((m) => m.id === movie.id)) {
+      console.warn(
+        `Movie with id ${movie.id} already exists. Cannot add duplicate.`
+      );
+      return;
     }
     this.movies.push(movie as Movie);
     this.movies = this.movies.slice();
