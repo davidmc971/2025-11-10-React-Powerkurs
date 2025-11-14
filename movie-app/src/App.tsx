@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import "./App.css";
 import MovieList from "./components/MovieList";
-import { DataHandler } from "./DataHandler";
 import { Link, Route, Routes } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import moviesSlice from "./redux/slices/moviesSlice";
 
 function App() {
-  const dataHandlerRef = useRef(new DataHandler());
-  const dataHandler = dataHandlerRef.current;
-
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -21,11 +19,8 @@ function App() {
     }
   }, []);
 
-  const [movies, setMovies] = useState(dataHandler.getMovies());
-
-  const updateMovies = useCallback(() => {
-    setMovies(dataHandler.getMovies());
-  }, [dataHandler]);
+  const movies = useSelector(moviesSlice.selectors.selectAllMovies);
+  const dispatch = useDispatch();
 
   const handleAddMovie = () => {
     const newMovie = {
@@ -34,8 +29,8 @@ function App() {
       rating: 0,
       isFavorite: false,
     };
-    dataHandler.addMovie(newMovie);
-    updateMovies();
+
+    dispatch(moviesSlice.actions.addMovie(newMovie));
   };
 
   useEffect(() => {
@@ -57,17 +52,17 @@ function App() {
           console.log("Fetched movies from external API:", data);
 
           data.results.forEach((movie) => {
-            dataHandler.addMovie({
+            const newMovie = {
               title: movie.title,
               description: movie.overview,
               rating: movie.vote_average,
               isFavorite: false,
-            });
+            };
+            dispatch(moviesSlice.actions.addMovie(newMovie));
           });
-          updateMovies();
         }
       );
-  }, [dataHandler, updateMovies]);
+  }, [dispatch]);
 
   return (
     <>
@@ -90,8 +85,6 @@ function App() {
           element={
             <MovieList
               movies={movies}
-              dataHandler={dataHandler}
-              updateMovies={updateMovies}
             />
           }
         />
@@ -100,8 +93,6 @@ function App() {
           element={
             <MovieList
               movies={movies}
-              dataHandler={dataHandler}
-              updateMovies={updateMovies}
               showOnlyFavorites
             />
           }

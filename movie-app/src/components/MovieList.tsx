@@ -1,18 +1,15 @@
 import { useReducer, useState } from "react";
-import type { DataHandler, Movie } from "../DataHandler";
 import { Star, StarOff } from "lucide-react";
+import { useDispatch } from "react-redux";
+import moviesSlice, { type Movie } from "../redux/slices/moviesSlice";
 
 type MovieListProps = {
   movies: Movie[];
-  dataHandler: DataHandler;
-  updateMovies: () => void;
   showOnlyFavorites?: boolean;
 };
 
 export default function MovieList({
   movies,
-  dataHandler,
-  updateMovies,
   showOnlyFavorites = false,
 }: MovieListProps) {
   const filteredMovies = movies.filter(
@@ -25,8 +22,6 @@ export default function MovieList({
         <MovieListItem
           key={movie.id}
           movie={movie}
-          dataHandler={dataHandler}
-          updateMovies={updateMovies}
         />
       ))}
     </ul>
@@ -35,28 +30,24 @@ export default function MovieList({
 
 type MovieListItemProps = {
   movie: Movie;
-  dataHandler: DataHandler;
-  updateMovies: () => void;
 };
 
 function MovieListItem({
   movie,
-  dataHandler,
-  updateMovies,
 }: MovieListItemProps) {
   const [isInEditMode, setIsInEditMode] = useState(false);
 
+  const dispatch = useDispatch();
+
   const handleDelete = () => {
-    dataHandler.deleteMovieById(movie.id);
-    updateMovies();
+    dispatch(moviesSlice.actions.deleteMovieById(movie.id));
   };
 
   const handleRate = () => {
     const userInput = prompt("Neue Bewertung eingeben (0-10):") ?? "";
     const newRating = parseFloat(userInput);
     if (!isNaN(newRating) && newRating >= 0 && newRating <= 10) {
-      dataHandler.rateMovie(movie.id, newRating);
-      updateMovies();
+      dispatch(moviesSlice.actions.rateMovie({ id: movie.id, rating: newRating }) );
     }
   };
 
@@ -65,14 +56,12 @@ function MovieListItem({
   };
 
   const onEditSubmit = (updatedMovie: Movie) => {
-    dataHandler.updateMovie(updatedMovie);
-    updateMovies();
+    dispatch(moviesSlice.actions.updateMovie(updatedMovie));
     setIsInEditMode(false);
   };
 
   const handleFavorite = () => {
-    dataHandler.toggleFavorite(movie.id);
-    updateMovies();
+    dispatch(moviesSlice.actions.toggleFavorite(movie.id));
   };
 
   if (isInEditMode) {
