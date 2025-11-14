@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import MovieList from "./components/MovieList";
 import { DataHandler } from "./DataHandler";
+import { Link, Route, Routes } from "react-router-dom";
 
 const dataHandler = new DataHandler();
 
@@ -20,18 +21,46 @@ function App() {
       isFavorite: false,
     };
     dataHandler.addMovie(newMovie);
-    updateMovies()
-  }
+    updateMovies();
+  };
 
   return (
     <>
       <h1>Welcome to Movie App</h1>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/">Movies</Link>
+          </li>
+          <li>
+            <Link to="/favorites">Favorites</Link>
+          </li>
+        </ul>
+      </nav>
       <button onClick={handleAddMovie}>Add Movie</button>
-      <MovieList
-        movies={movies}
-        dataHandler={dataHandler}
-        updateMovies={updateMovies}
-      />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <MovieList
+              movies={movies}
+              dataHandler={dataHandler}
+              updateMovies={updateMovies}
+            />
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <MovieList
+              movies={movies}
+              dataHandler={dataHandler}
+              updateMovies={updateMovies}
+              showOnlyFavorites
+            />
+          }
+        />
+      </Routes>
     </>
   );
 }

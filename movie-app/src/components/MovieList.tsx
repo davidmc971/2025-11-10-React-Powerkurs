@@ -6,16 +6,22 @@ type MovieListProps = {
   movies: Movie[];
   dataHandler: DataHandler;
   updateMovies: () => void;
+  showOnlyFavorites?: boolean;
 };
 
 export default function MovieList({
   movies,
   dataHandler,
   updateMovies,
+  showOnlyFavorites = false,
 }: MovieListProps) {
+  const filteredMovies = movies.filter((movie) =>
+    !showOnlyFavorites || movie.isFavorite
+  );
+
   return (
     <ul>
-      {movies.map((movie) => (
+      {filteredMovies.map((movie) => (
         <MovieListItem
           key={movie.id}
           movie={movie}
