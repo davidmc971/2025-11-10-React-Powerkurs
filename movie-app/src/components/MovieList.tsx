@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import type { DataHandler, Movie } from "../DataHandler";
 import { Star, StarOff } from "lucide-react";
 
@@ -15,8 +15,8 @@ export default function MovieList({
   updateMovies,
   showOnlyFavorites = false,
 }: MovieListProps) {
-  const filteredMovies = movies.filter((movie) =>
-    !showOnlyFavorites || movie.isFavorite
+  const filteredMovies = movies.filter(
+    (movie) => !showOnlyFavorites || movie.isFavorite
   );
 
   return (
@@ -95,17 +95,33 @@ function MovieListItem({
   );
 }
 
+const editMovieReducer = (
+  state: Movie,
+  action: {
+    type: "setTitle" | "setDescription";
+    value: string;
+  }
+): Movie => {
+  switch (action.type) {
+    case "setTitle":
+      return { ...state, title: action.value };
+    case "setDescription":
+      return { ...state, description: action.value };
+    default:
+      return state;
+  }
+};
+
 type MovieItemEditProps = {
   movie: Movie;
   onSubmit: (updatedMovie: Movie) => void;
 };
 
 function MovieItemEdit({ movie, onSubmit }: MovieItemEditProps) {
-  const [title, setTitle] = useState(movie.title);
-  const [description, setDescription] = useState(movie.description);
+  const [movieState, dispatch] = useReducer(editMovieReducer, movie);
 
   const handleSubmit = () => {
-    onSubmit({ ...movie, title, description });
+    onSubmit(movieState);
   };
 
   return (
@@ -113,12 +129,14 @@ function MovieItemEdit({ movie, onSubmit }: MovieItemEditProps) {
       <h2>Edit Movie: {movie.title}</h2>
       <input
         type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={movieState.title}
+        onChange={(e) => dispatch({ type: "setTitle", value: e.target.value })}
       />
       <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        value={movieState.description}
+        onChange={(e) =>
+          dispatch({ type: "setDescription", value: e.target.value })
+        }
       />
       <button onClick={handleSubmit}>Save</button>
     </li>
