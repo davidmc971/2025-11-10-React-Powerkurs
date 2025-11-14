@@ -17,6 +17,7 @@ function App() {
       title: "New Movie",
       description: "A newly added movie",
       rating: 0,
+      isFavorite: false,
     };
     dataHandler.addMovie(newMovie);
     updateMovies()

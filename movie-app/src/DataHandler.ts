@@ -3,6 +3,7 @@ export type Movie = {
   title: string;
   description: string;
   rating: number;
+  isFavorite: boolean;
 };
 
 type NewMovie = Omit<Movie, "id"> & { id?: number };
@@ -19,30 +20,35 @@ export class DataHandler {
         title: "Inception",
         description: "A mind-bending thriller",
         rating: 8.8,
+        isFavorite: false,
       },
       {
         id: 2,
         title: "The Matrix",
         description: "A sci-fi classic",
         rating: 8.7,
+        isFavorite: false,
       },
       {
         id: 3,
         title: "Interstellar",
         description: "A journey through space and time",
         rating: 8.6,
+        isFavorite: false,
       },
       {
         id: 4,
         title: "The Dark Knight",
         description: "A gripping superhero tale",
         rating: 9.0,
+        isFavorite: false,
       },
       {
         id: 5,
         title: "Pulp Fiction",
         description: "A cult classic crime film",
         rating: 8.9,
+        isFavorite: false,
       },
     ];
     this.nextMovieId = 6;
@@ -84,10 +90,18 @@ export class DataHandler {
       movie.description = updatedMovie.description;
     }
     this.movies = this.movies.slice();
-    
+
     // Alternativ:
     // this.movies = this.movies.map((movie) =>
     //   movie.id === updatedMovie.id ? updatedMovie : movie
     // );
+  }
+
+  toggleFavorite(id: number) {
+    const movie = this.movies.find((m) => m.id === id);
+    if (movie) {
+      movie.isFavorite = !movie.isFavorite;
+    }
+    this.movies = this.movies.slice();
   }
 }

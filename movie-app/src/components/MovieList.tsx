@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { DataHandler, Movie } from "../DataHandler";
+import { Star, StarOff } from "lucide-react";
 
 type MovieListProps = {
   movies: Movie[];
@@ -63,6 +64,11 @@ function MovieListItem({
     setIsInEditMode(false);
   };
 
+  const handleFavorite = () => {
+    dataHandler.toggleFavorite(movie.id);
+    updateMovies();
+  };
+
   if (isInEditMode) {
     return <MovieItemEdit movie={movie} onSubmit={onEditSubmit} />;
   }
@@ -73,6 +79,9 @@ function MovieListItem({
         {movie.title} ({movie.rating})
       </h2>
       <p>{movie.description}</p>
+      <button onClick={handleFavorite}>
+        {movie.isFavorite ? <StarOff size={14} /> : <Star size={14} />}
+      </button>
       <button onClick={handleRate}>Rate</button>
       <button onClick={toggleEditMode}>Edit</button>
       <button onClick={handleDelete}>Delete</button>
