@@ -8,7 +8,7 @@ export type Movie = {
   isFavorite: boolean;
 };
 
-type NewMovie = Omit<Movie, "id"> & { id?: number };
+export type NewMovie = Omit<Movie, "id"> & { id?: number };
 
 const LOCAL_STORAGE_KEY = "movies";
 
