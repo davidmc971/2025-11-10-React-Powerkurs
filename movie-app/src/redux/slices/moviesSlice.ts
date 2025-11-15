@@ -8,8 +8,16 @@ export type Movie = {
   isFavorite: boolean;
 };
 
+// NewMovie ist wie Movie, aber die id ist optional,
+// da sie beim Erstellen eines neuen Films noch nicht
+// festgelegt sein muss.
 export type NewMovie = Omit<Movie, "id"> & { id?: number };
 
+// Bei der lokalen Speicherung der Filme im
+// localStorage nutzen wir diesen Schlüssel.
+// Diesen hier als Konstante zu definieren hilft
+// Fehler bei der Implementierung oder bei Refactorings
+// zu vermeiden.
 const LOCAL_STORAGE_KEY = "movies";
 
 const defaultMovies: Movie[] = [
@@ -50,11 +58,16 @@ const defaultMovies: Movie[] = [
   },
 ];
 
+// Der Zustand des Movies-Slices, analog dazu, wie wir zuvor
+// die Attribute der Klasse DataHandler definiert hatten.
 export type MoviesState = {
   movies: Movie[];
   nextMovieId: number;
 }
 
+// Hilfsfunktion, die einen Anfangszustand für unseren Slice initialisiert.
+// Hier laden wir die Filme aus dem localStorage, oder nutzen
+// defaultMovies, falls keine im localStorage vorhanden sind.
 function initilizeState(): MoviesState {
   const storedMovies = localStorage.getItem(LOCAL_STORAGE_KEY);
   const movies: Movie[] = storedMovies
@@ -72,6 +85,9 @@ function initilizeState(): MoviesState {
   };
 }
 
+// Hilfsfunktion, die die aktuelle Liste der Filme
+// im localStorage speichert. Man könnte das automatische
+// abspeichern auch in eine eigene Middleware auslagern.
 function persistMovies(movies: Movie[]) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(movies));
 }
@@ -79,7 +95,15 @@ function persistMovies(movies: Movie[]) {
 export const moviesSlice = createSlice({
   name: "movies",
   initialState: initilizeState(),
+  // Die Reducer definieren die verschiedenen Aktionen,
+  // mit denen wir den Movies-State mutieren können.
   reducers: {
+    // Ein Reducer erhält immer den aktuellen State und eine
+    // Action, die die neuen Daten, unsere Payload, enthält.
+    // Hierbei wird kein Typ benötigt, da die Zuordnung automatisch erfolgt.
+    // createSlice aus Redux Toolkit erstellt nämlich für jeden
+    // Reducer automatisch einen Action-Creator mit dem gleichen
+    // Namen, der den Typ in seinem Action-Objekt zurückgibt.
     addMovie: (state, action: { payload: NewMovie }) => {
       const movie = action.payload;
       if (movie.id === undefined) {
@@ -128,6 +152,8 @@ export const moviesSlice = createSlice({
       persistMovies(state.movies);
     },
   },
+  // Selektoren sind Hilfsfunktionen, die es uns erlauben,
+  // bestimmte Teile des States einfach auszulesen.
   selectors: {
     selectAllMovies: (state: MoviesState) => state.movies,
     selectFavoriteMovies: (state: MoviesState) =>
@@ -135,4 +161,13 @@ export const moviesSlice = createSlice({
   },
 });
 
+// Wir echten den Slice als Default-Export,
+// damit er einfach importiert werden kann.
 export default moviesSlice;
+
+// Es würde sich auch anbieten, die Actions und Selektoren
+// separat zu exportieren, damit sie einfach importiert
+// und genutzt werden könnten. Das sieht man häufig in
+// der Praxis, ist aber hier nicht zwingend notwendig.
+// export const moviesActions = moviesSlice.actions;
+// export const moviesSelectors = moviesSlice.selectors;
